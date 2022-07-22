@@ -1,0 +1,54 @@
+version: "2"
+
+networks:
+    patroni:
+
+services:
+    etcd:
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        networks: [ patroni ]
+        environment:
+            ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
+            ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+            ETCD_INITIAL_CLUSTER: ${server1}=http://${server1ip}:2380,${server2}=http://${server2ip}:2380,${server3}=http://${server3ip}:2380
+            ETCD_INITIAL_CLUSTER_STATE: new
+            ETCD_INITIAL_CLUSTER_TOKEN: MyToken
+            ETCD_INITIAL_ADVERTISE_PEER_URLS: http://${thisip}:2380
+            ETCD_ADVERTISE_CLIENT_URLS: http://${thisip}:2379,http://${thisip}:2380
+        container_name: patroni-etcd
+        command: etcd -name ${thisserver} -enable-v2
+        ports:
+            - "2379:2379"
+            - "2380:2380"
+
+    haproxy:
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        networks: [ patroni ]
+        env_file: patroni.env
+        hostname: haproxy
+        container_name: patroni-haproxy
+        ports:
+            - "5000:5000"
+            - "5001:5001"
+        command: haproxy
+        environment: &env
+            ETCDCTL_ENDPOINTS: http://${server1}:2379,http://${server2}:2379,http://${server3}:2379
+            PATRONI_ETCD3_HOSTS: "'${server1}:2379','${server2}:2379','${server3}:2379'"
+            PATRONI_POSTGRESQL_DATA_DIR: /home/postgres/data
+            PATRONI_SCOPE: patroni
+
+    patroni:
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        networks: [ patroni ]
+        env_file: patroni.env
+        hostname: patroni
+        container_name: patroni
+        environment: 
+            <<: *env
+            PATRONI_NAME: ${thisserver}
+            PATRONI_POSTGRESQL_CONNECT_ADDRESS: ${thisip}:5432
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./pg-data:/home/postgres/data:Z
+        

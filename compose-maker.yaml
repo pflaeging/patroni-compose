@@ -1,0 +1,7 @@
+server:
+- name: elrond.pfpk.pro
+  ip: 185.207.105.145
+- name: ostoher.pfpk.pro
+  ip: 185.228.137.37
+- name: pippin.pfpk.pro
+  ip: 5.252.225.246
