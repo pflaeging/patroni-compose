@@ -1,11 +1,12 @@
-version: "2"
+# Made for: ${thisserver} with ${thisip}
+version: "3"
 
 networks:
     patroni:
 
 services:
     etcd:
-        image: quay.io/pflaeging/patroni-postgres:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
         networks: [ patroni ]
         environment:
             ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
@@ -14,15 +15,19 @@ services:
             ETCD_INITIAL_CLUSTER_STATE: new
             ETCD_INITIAL_CLUSTER_TOKEN: MyToken
             ETCD_INITIAL_ADVERTISE_PEER_URLS: http://${thisip}:2380
-            ETCD_ADVERTISE_CLIENT_URLS: http://${thisip}:2379,http://${thisip}:2380
+            ETCD_ADVERTISE_CLIENT_URLS: http://${thisip}:2379
         container_name: patroni-etcd
-        command: etcd -name ${thisserver} -enable-v2
+        command: etcd -name ${thisserver}
         ports:
             - "2379:2379"
             - "2380:2380"
+        extra_hosts:
+            - "${server1}:${server1ip}"
+            - "${server2}:${server2ip}"
+            - "${server3}:${server3ip}"
 
     haproxy:
-        image: quay.io/pflaeging/patroni-postgres:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
         networks: [ patroni ]
         env_file: patroni.env
         hostname: haproxy
@@ -32,13 +37,17 @@ services:
             - "5001:5001"
         command: haproxy
         environment: &env
-            ETCDCTL_ENDPOINTS: http://${server1}:2379,http://${server2}:2379,http://${server3}:2379
+            ETCDCTL_ENDPOINTS: http://${server1ip}:2379,http://${server2ip}:2379,http://${server3ip}:2379
             PATRONI_ETCD3_HOSTS: "'${server1}:2379','${server2}:2379','${server3}:2379'"
             PATRONI_POSTGRESQL_DATA_DIR: /home/postgres/data
             PATRONI_SCOPE: patroni
+        extra_hosts:
+            - "${server1}:${server1ip}"
+            - "${server2}:${server2ip}"
+            - "${server3}:${server3ip}"
 
     patroni:
-        image: quay.io/pflaeging/patroni-postgres:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:latest
         networks: [ patroni ]
         env_file: patroni.env
         hostname: postgres
@@ -55,4 +64,8 @@ services:
             - "8008:8008"
         volumes:
             - ./pg-data:/home/postgres/data:Z
-        
+        extra_hosts:
+            - "${server1}:${server1ip}"
+            - "${server2}:${server2ip}"
+            - "${server3}:${server3ip}"
+# End of config

@@ -1,2 +1,2 @@
-hosts/
+hosts/**
 distribute-config.sh
