@@ -32,5 +32,6 @@ for serverrecord in d['server']:
   print("ssh root@%s mkdir -p /opt/patroni" % s, file = dist)
   print("scp hosts/%s/* root@%s:/opt/patroni/" % (s,s), file = dist)
   print('ssh root@%s "mkdir -p /opt/patroni/pg-data; chown 999:999 /opt/patroni/pg-data; chmod 750 /opt/patroni/pg-data; chcon -Rt svirt_sandbox_file_t /opt/patroni/pg-data"' % s, file = dist)
+  print('ssh root@%s "mkdir -p /opt/patroni/etcd-data; chown 999:999 /opt/patroni/etcd-data; chmod 750 /opt/patroni/etcd-data; chcon -Rt svirt_sandbox_file_t /opt/patroni/etcd-data"' % s, file = dist)
   
 dist.close()

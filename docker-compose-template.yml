@@ -7,6 +7,7 @@ networks:
 services:
     etcd:
         image: quay.io/pflaeging/postgres-patroni-compose:latest
+        restart: unless-stopped
         networks: [ patroni ]
         environment:
             ETCD_LISTEN_PEER_URLS: http://0.0.0.0:2380
@@ -16,6 +17,9 @@ services:
             ETCD_INITIAL_CLUSTER_TOKEN: MyToken
             ETCD_INITIAL_ADVERTISE_PEER_URLS: http://${thisip}:2380
             ETCD_ADVERTISE_CLIENT_URLS: http://${thisip}:2379
+            ETCD_DATA_DIR: /home/postgres/etcd-data
+        volumes:
+            - ./etcd-data:/home/postgres/etcd-data:Z
         container_name: patroni-etcd
         command: etcd -name ${thisserver}
         ports:
@@ -28,6 +32,7 @@ services:
 
     haproxy:
         image: quay.io/pflaeging/postgres-patroni-compose:latest
+        restart: unless-stopped
         networks: [ patroni ]
         env_file: patroni.env
         hostname: haproxy
@@ -49,6 +54,7 @@ services:
 
     patroni:
         image: quay.io/pflaeging/postgres-patroni-compose:latest
+        restart: unless-stopped
         networks: [ patroni ]
         env_file: patroni.env
         hostname: postgres
