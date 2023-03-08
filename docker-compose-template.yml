@@ -35,6 +35,7 @@ services:
         ports:
             - "5000:5000"
             - "5001:5001"
+            - "7000:7000"
         command: haproxy
         environment: &env
             ETCDCTL_ENDPOINTS: http://${server1ip}:2379,http://${server2ip}:2379,http://${server3ip}:2379
