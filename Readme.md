@@ -9,7 +9,7 @@ Goal:
 
 ## Host system installation
 
-This system is tested with Alma Linux 8.6 hosts. Should work without modification also with Rocky Linux, CentOS 8, Fedora or RHEL8
+This system is tested with Alma Linux 8.7 hosts. Should work without modification also with Rocky Linux, CentOS 8, Fedora or RHEL8
 
 You need:
 
@@ -38,6 +38,15 @@ I think it's also working with podman and podman-compose, ...
 - distribute with the new script: `sh distribute-config.sh` (shell script which copies the config to the hosts. Created by compose-maker.py)
 - go to the configured hosts and do the following: `cd /opt/patroni; docker compose up -d`
 - Ready!
+
+## Build the container
+
+There's a script attached (./build-container.sh) which builds the container with the correct configuration
+
+## ToDo
+
+- incorporate my patches (peter pfläging) in the main patroni config
+- mybe better documentation?
 
 ---
 Peter Pfläging <<peter@pflaeging.net>>

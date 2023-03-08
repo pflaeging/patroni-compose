@@ -6,7 +6,7 @@ networks:
 
 services:
     etcd:
-        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:v3.0.1
         restart: unless-stopped
         networks: [ patroni ]
         environment:
@@ -31,7 +31,7 @@ services:
             - "${server3}:${server3ip}"
 
     haproxy:
-        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:v3.0.1
         restart: unless-stopped
         networks: [ patroni ]
         env_file: patroni.env
@@ -53,7 +53,7 @@ services:
             - "${server3}:${server3ip}"
 
     patroni:
-        image: quay.io/pflaeging/postgres-patroni-compose:latest
+        image: quay.io/pflaeging/postgres-patroni-compose:v3.0.1
         restart: unless-stopped
         networks: [ patroni ]
         env_file: patroni.env
